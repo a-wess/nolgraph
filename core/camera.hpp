@@ -1,6 +1,6 @@
 #pragma once
-#include <math.hpp>
-#include <objects.hpp>
+#include "math/math.hpp"
+#include "objects.hpp"
 
 class Camera {
  public:
@@ -9,7 +9,7 @@ class Camera {
   void update_axis();
   void update_origin(const vec3<float>& _origin) { origin = _origin; update_axis(); };
   void update_dir(const vec3<float>& _dir) { dir = _dir; update_axis(); };
- private:
+  // private:
   vec3<float> origin;
   vec3<float> dir;
   vec3<float> right;

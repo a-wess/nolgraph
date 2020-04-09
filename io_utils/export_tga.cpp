@@ -1,4 +1,4 @@
-#include <exporters.hpp>
+#include "exporters.hpp"
 #include <fstream>
 #include <array>
 
@@ -6,7 +6,7 @@ void export_tga(const std::vector<Pixel>& buffer, const std::pair<uint16_t, uint
   std::ofstream out_img("canvas.tga", std::ios::binary);
   
   std::array<uint8_t, 12> header = {
-    1, // id length
+    0, // id length
     0, // colormap type
     2, // image type
     0,0,0,0,0, // color map specifications

@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <utility>
-#include <canvas.hpp>
+#include "canvas.hpp"
 
 void export_bmg(const std::vector<Pixel>& buffer);
 void export_png(const std::vector<Pixel>& buffer, const std::pair<unsigned int, unsigned int>& size);
