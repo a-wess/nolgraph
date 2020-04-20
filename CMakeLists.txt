@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE Debug)
 project( rays )
 
 include_directories(
-  ./
+  include/
 )
 
 set_target_properties(${TARGET} PROPERTIES
@@ -15,24 +15,26 @@ set_target_properties(${TARGET} PROPERTIES
 )
 
 set(CORE
-  ./core/camera.cpp
-  ./core/renderer.cpp
+  ./src/core/camera.cpp
+  ./src/core/renderer.cpp
 )
 
-set(IO_UTILS
-  ./io_utils/canvas.cpp
-  ./io_utils/export_tga.cpp
-  ./io_utils/gltf.cpp
-  ./io_utils/json.cpp
-)
+set(IO_SYSTEM
+  ./src/io_system/canvas.cpp
+  ./src/io_system/export_tga.cpp
+  ./src/io_system/gltf.cpp
+  ./src/io_system/json.cpp
+  )
 
-set(MATH)
+set(PRIMITIVES
+  ./src/primitives/triangle.cpp
+ )
 
 set(SRCS
-  ./main.cpp
+  ./src/main.cpp
   ${CORE}
-  ${IO_UTILS}
-  ${MATH}
+  ${IO_SYSTEM}
+  ${PRIMITIVES}
 )
 
 add_executable(rays ${SRCS})

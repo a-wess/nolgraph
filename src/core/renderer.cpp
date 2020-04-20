@@ -1,4 +1,4 @@
-#include "renderer.hpp"
+#include <core/renderer.hpp>
 
 std::pair<int, float> Scene::intersect (const Ray& ray) const {
   auto intersection = std::make_pair(-1, INFINITY);
@@ -31,7 +31,7 @@ vec3<float> trace(const Ray& primary_ray, const Scene& scene, int depth) {
     if (material.specular_coef > 0.05) {
       auto view_vector = primary_ray.dir * -1.0f;
       auto light_vector = N * 2 * view_vector.dot(N) - view_vector;
-      if (depth > 0) std::cout << material.specular_coef << '\n';
+      
       Ray from_specular;
       from_specular.origin = p + N * 1e-4;
       from_specular.dir = light_vector;

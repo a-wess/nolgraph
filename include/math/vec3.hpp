@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _RAYS_MATH_
+#define _RAYS_MATH_
+
 #include <cmath>
 #include <iostream>
 
@@ -70,3 +72,5 @@ template <typename T>
 vec3<T> operator-(const vec3<T>& a, const vec3<T>& b) {
   return vec3<T>(a.x - b.x, a.y - b.y, a.z - b.z);
 }
+
+#endif

@@ -1,6 +1,8 @@
-#pragma once
-#include "math/math.hpp"
-#include "objects.hpp"
+#ifndef _RAYS_CAMERA_
+#define _RAYS_CAMERA_
+
+#include <math/vec3.hpp>
+#include <primitives/types.hpp>
 
 class Camera {
  public:
@@ -16,3 +18,5 @@ class Camera {
   vec3<float> up;
   float aspect_ratio;
 };
+
+#endif

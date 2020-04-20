@@ -1,6 +1,8 @@
-#pragma once
-#include "math/math.hpp"
-#include "objects.hpp"
+#ifndef _RAYS_RENDERER_
+#define _RAYS_RENDERER_
+
+#include <math/vec3.hpp>
+#include <primitives/types.hpp>
 #include <memory>
 #include <vector>
 
@@ -35,3 +37,5 @@ private:
 
 vec3<float> trace(const Ray& primary_ray, const Scene& scene, int depth);
 vec3<float> shade_point(const Ray& primary_ray, const Scene& scene);
+
+#endif

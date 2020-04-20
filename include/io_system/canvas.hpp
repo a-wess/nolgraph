@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _RAYS_CANVAS_
+#define _RAYS_CANVAS_
+
 #include <iostream>
 #include <vector>
 #include <cstdint>
@@ -17,3 +19,5 @@ public:
   unsigned int width;
   unsigned int height;
 };
+
+#endif

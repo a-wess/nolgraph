@@ -1,0 +1,2 @@
+* Fast Ray-Triangle intersection algorithm
+http://webserver2.tecgraf.puc-rio.br/~mgattass/cg/trbRR/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
