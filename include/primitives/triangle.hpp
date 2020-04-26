@@ -18,12 +18,10 @@ public:
 class Triangle : public I_surface {
 public:
   Triangle(int _indice,  TriangleMesh* _mesh) : indice(_indice), mesh(_mesh) {};
-  float intersect(const Ray& ray);
-  vec3<float> normal_at(const vec3<float>& point);
-  int get_material_idx() { return 0; }
+  Intersection intersect(const Ray& ray);
 private:
   int indice;
-  std::shared_ptr<TriangleMesh> mesh;
+  TriangleMesh *mesh;
 };
 
 #endif

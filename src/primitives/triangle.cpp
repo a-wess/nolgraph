@@ -22,8 +22,12 @@ TriangleMesh::TriangleMesh() {
   triangles_count = NUM_ROBOT_OBJECT_INDEX / 3;
 }
 
-float Triangle::intersect(const Ray& ray) {
-  int i = indice  * 3;
+Intersection Triangle::intersect(const Ray& ray) {
+  Intersection result;
+  result.position = { INFINITY, INFINITY, INFINITY };
+  result.surface_normal = { 0.0f, 0.0f, 0.0f };
+  
+  int i = indice * 3;
   vec3<float> p0 = mesh->positions[mesh->indices[i]];
   vec3<float> p1 = mesh->positions[mesh->indices[i + 1]];
   vec3<float> p2 = mesh->positions[mesh->indices[i + 2]];
@@ -32,28 +36,21 @@ float Triangle::intersect(const Ray& ray) {
   float a, f, u, v;
   vec3<float> h = ray.dir.cross(e2);
   a = e1.dot(h);
-  if (a > -EPSILON && a < EPSILON) return INFINITY;
+  if (a > -EPSILON && a < EPSILON) return result;
 
   f = 1.0/a;
   vec3<float> s = ray.origin - p0;
   u = f * s.dot(h);
-  if (u < 0.0 || u > 1.0) return INFINITY;
+  if (u < 0.0 || u > 1.0) return result;
 
   vec3<float> q = s.cross(e1);
   v = f * ray.dir.dot(q);
-  if (v < 0.0f || u + v > 1.0) return INFINITY;
+  if (v < 0.0f || u + v > 1.0) return result;
 
   float t = f * e2.dot(q);
-  if (t > EPSILON) return t;
-  else return INFINITY;
-}
-
-vec3<float> Triangle::normal_at(const vec3<float>& point) {
-  int i = indice * 3;
-  vec3<float> p0 = mesh->positions[mesh->indices[i]];
-  vec3<float> p1 = mesh->positions[mesh->indices[i + 1]];
-  vec3<float> p2 = mesh->positions[mesh->indices[i + 2]];
-  vec3<float> e1 = p1 - p0;
-  vec3<float> e2 = p2 - p0;
-  return e1.cross(e2).norm();
+  if (t > EPSILON) {
+    result.position = ray.point_at(t);
+    result.surface_normal = (p1 - p0).cross(p2 - p0).norm();
+  }
+  return result;
 }

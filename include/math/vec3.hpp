@@ -1,5 +1,5 @@
-#ifndef _RAYS_MATH_
-#define _RAYS_MATH_
+#ifndef _RAYS_VEC3_
+#define _RAYS_VEC3_
 
 #include <cmath>
 #include <iostream>

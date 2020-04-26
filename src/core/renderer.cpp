@@ -1,31 +1,55 @@
 #include <core/renderer.hpp>
+#include <thread>
 
-std::pair<int, float> Scene::intersect (const Ray& ray) const {
-  auto intersection = std::make_pair(-1, INFINITY);
-  for (std::size_t i = 0; i < shapes.size(); i++) {
-    float d_to_shape = shapes[i]->intersect(ray);
-    if (d_to_shape < intersection.second) {
-      intersection.second = d_to_shape;
-      intersection.first = i;
-    }
-  }
-
-  return intersection;
+void render_kernel(Renderer* renderer, Tile* tiles, int start, int n) {
+  for (auto i = start; i < start + n; i++)
+    renderer->process_tile(tiles[i]);
+  std::cout << "Thread has finished " << start << '\n';
 }
 
+void Renderer::render() {
+  std::vector<Tile> tiles;
+  int rows = horiz / 32;
+  int cols = vert / 32;
+  std::vector<std::thread> render_workers;
+  
+  for (int i = 0; i < rows * cols; i++) {
+    Tile t;
+    t.x = i % rows;
+    t.y = i / rows;
+    t.w = 32;
+    t.h = 32;
+    tiles.push_back(t);
+  }
+
+  int tile_count = rows * cols;
+  int tiles_per_thread = std::ceil(tile_count / 6.0f);
+  std::cout << tile_count << ' ' << tiles_per_thread << '\n';
+
+  for (int i = 0; i < tile_count; i += tiles_per_thread) {
+    std::thread tmp(render_kernel, this, tiles.data(), i, i + tiles_per_thread < tile_count ? tiles_per_thread : tile_count - i);
+    std::cout << i << ' ' << ((i + tiles_per_thread) < tile_count ? tiles_per_thread : tile_count - i) << '\n';
+    render_workers.push_back(std::move(tmp));
+  }
+
+  for (auto& worker : render_workers)
+    worker.join();
+  std::cout << "Threads are finished\n";
+}
 // TODO: Solve self collision problem
-vec3<float> trace(const Ray& primary_ray, const Scene& scene, int depth) {
+vec3<float> Renderer::trace(const Ray& primary_ray, int depth) {
   vec3<float> color(0.0f, 0.0f, 0.0f);
   if (depth > 1) return vec3<float>(0.8f,0.2f,0.0f);
 
-  auto intersection = scene.intersect(primary_ray);
-  if (intersection.first > -1) {
-    auto& surface = scene.get_shape(intersection.first);
-    auto& material = scene.get_material(surface.get_material_idx());
-    auto p = primary_ray.point_at(intersection.second);
-    auto N = surface.normal_at(p);
+  auto intersection = scene->intersect(primary_ray);
+  if (intersection.position.x != INFINITY
+      && intersection.position.y != INFINITY
+      && intersection.position.z != INFINITY) {
+    auto& material = scene->get_material(0);
+    auto p = intersection.position;
+    auto N = intersection.surface_normal;
 
-    color += material.diffuse_coef * std::max(N.dot(scene.sun), 0.0f) * material.diffuse;
+    color += material.diffuse_coef * std::max(N.dot(scene->sun_direction), 0.0f) * material.diffuse;
   
     // Specular part calculation
     if (material.specular_coef > 0.05) {
@@ -36,7 +60,7 @@ vec3<float> trace(const Ray& primary_ray, const Scene& scene, int depth) {
       from_specular.origin = p + N * 1e-4;
       from_specular.dir = light_vector;
       float specular = pow(std::max(light_vector.dot(N), 0.0f), 1);
-      auto specular_color = trace(from_specular, scene, depth + 1);
+      auto specular_color = trace(from_specular, depth + 1);
       specular_color *= material.specular_coef * specular;
       //    if (specular_color.value() > 0)
       color += specular_color;//specular_color * material.specular_coef * specular;
@@ -46,3 +70,25 @@ vec3<float> trace(const Ray& primary_ray, const Scene& scene, int depth) {
     return vec3<float>(0.8f,0.2f,0.0f);
   }
 };
+
+
+void Renderer::process_tile(Tile& tile) {
+  int x = tile.x * tile.w;
+  int y = tile.y * tile.h;
+  for(int i = 0; i < tile.h; i++) {
+    for(int j = 0; j < tile.w; j++) {
+      float u  = static_cast<float>(j + x) / horiz;
+      float v = static_cast<float>(i + y) / vert;
+      Ray from_eye = scene->get_camera().shoot_ray(u, 1.0f - v);
+      auto color = trace(from_eye, 0);
+      // samples[i * tile.w + j] = color;
+      samples[(y + i) * horiz + x + j] = color;
+    }
+  }
+}
+
+void Renderer::set_resolution(int x, int y) {
+  horiz = x + x % tile_size;
+  vert = y + y % tile_size;
+  samples.resize(horiz * vert);
+}

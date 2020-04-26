@@ -1,0 +1,11 @@
+RAYS PROJECT -*- mode: org -*-
+
+* Things to accomplish
+** TODO Implement BVH tree or another acceleration structure
+** TODO Learn more about triangle-ray intersection algorithm and try to derive them by yourself
+** TODO Revise some crucial topics from Linear Algebra
+** TODO Refactor Scene class
+** TODO Try to implement simple path tracing algorithm
+** TODO Make rendering proccess multi-threaded
+** TODO Implement PNG importer and exporter using only zlib
+** TODO Finish GLTF importer

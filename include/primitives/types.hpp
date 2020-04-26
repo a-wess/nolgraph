@@ -9,12 +9,14 @@ struct Ray {
   vec3<float> point_at(float t) const { return origin + dir * t; };
 };
 
+struct Intersection {
+  vec3<float> position;
+  vec3<float> surface_normal;
+};
 
 class I_surface {
 public:
-  virtual float intersect(const Ray& r) = 0;
-  virtual vec3<float> normal_at(const vec3<float>& p) = 0;
-  virtual int get_material_idx() = 0;
+  virtual Intersection intersect(const Ray& r) = 0;
 };
 
 #endif

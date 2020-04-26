@@ -5,37 +5,36 @@
 #include <primitives/types.hpp>
 #include <memory>
 #include <vector>
+#include "scene.hpp"
 
-struct PBR_material {
-  vec3<float> base_color;
-  float metaleness;
-  float roughness;
+struct Tile {
+  int x;
+  int y;
+  int w;
+  int h;
 };
 
-struct Cheap_material {
-  vec3<float> diffuse;
-  float specular_coef;
-  float diffuse_coef;
-};
-
-class Scene {
+class Renderer {
 public:
-  Scene(vec3<float> s): sun(s) {};
-  std::pair<int, float> intersect(const Ray& ray) const;
+  Renderer(int w, int h, int t_size = 32): tile_size(t_size) { set_resolution(w, h); };
+  void render();
+  void process_tile(Tile& tile);
 
-  I_surface& get_shape(int index) const { return *(shapes[index]); };
-  void add_shape(std::shared_ptr<I_surface>&& shape_ptr) { shapes.push_back(shape_ptr); };
+  vec3<float> trace(const Ray& primary_ray, int depth);
 
-  const Cheap_material& get_material(int index) const { return materials[index]; };
-  void add_material(Cheap_material&& m) { materials.push_back(m); }
+  void set_scene(Scene *s) { scene = s; };
+  void set_resolution(int x, int y);
 
-  vec3<float> sun;
+  std::vector<vec3<float>> &get_samples() { return samples; };
+  int get_width() { return horiz; };
+  int get_height() { return vert; };
+
 private:
-  std::vector<Cheap_material> materials;
-  std::vector<std::shared_ptr<I_surface>> shapes;
+  int vert;
+  int horiz;
+  int tile_size;
+  Scene* scene;
+  std::vector<vec3<float>> samples;
 };
-
-vec3<float> trace(const Ray& primary_ray, const Scene& scene, int depth);
-vec3<float> shade_point(const Ray& primary_ray, const Scene& scene);
 
 #endif

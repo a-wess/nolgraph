@@ -9,6 +9,8 @@ include_directories(
   include/
 )
 
+find_package(Threads)
+
 set_target_properties(${TARGET} PROPERTIES
   CXX_STANDARD 17
   CXX_STANDARD_REQUIRED YES
@@ -17,6 +19,7 @@ set_target_properties(${TARGET} PROPERTIES
 set(CORE
   ./src/core/camera.cpp
   ./src/core/renderer.cpp
+  ./src/core/scene.cpp
 )
 
 set(IO_SYSTEM
@@ -39,7 +42,7 @@ set(SRCS
 
 add_executable(rays ${SRCS})
 target_compile_features(rays PUBLIC cxx_std_17)
-
+target_link_libraries(rays ${CMAKE_THREAD_LIBS_INIT})
 #set(TEST
 #  ./src/camera.cpp
 # ./src/renderer.cpp
