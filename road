@@ -6,6 +6,6 @@ RAYS PROJECT -*- mode: org -*-
 ** TODO Revise some crucial topics from Linear Algebra
 ** TODO Refactor Scene class
 ** TODO Try to implement simple path tracing algorithm
-** TODO Make rendering proccess multi-threaded
+** DONE Make rendering proccess multi-threaded
 ** TODO Implement PNG importer and exporter using only zlib
 ** TODO Finish GLTF importer

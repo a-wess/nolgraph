@@ -1,20 +1,21 @@
 #include <core/scene.hpp>
+#include <cassert>
 
 Intersection Scene::intersect (const Ray& ray) {
-  Intersection result;
-  result.position = {
-    INFINITY,
-    INFINITY,
-    INFINITY
-  };
+  assert(bvh.is_ready());
+  return bvh.traverse(ray);
+}
 
-  for (std::size_t i = 0; i < shapes.size(); i++) {
-    auto intersection = shapes[i]->intersect(ray);
-    if ((intersection.position - ray.origin).value() < (result.position - ray.origin).value()) {
-      result.position = intersection.position;
-      result.surface_normal = intersection.surface_normal;
-    }
+void Scene::add_mesh(TriMesh* mesh) {
+  meshes.push_back(mesh);
+  for(int i = 0; i < mesh->triangles_count; i++) {
+    triangles.push_back(Triangle(i * 3, mesh));
   }
+}
 
-  return result;
+void Scene::prepare_scene() {
+  assert(!bvh.is_ready());
+  for (auto& t : triangles)
+    bvh.push_primitive(&t);
+  bvh.build();
 }

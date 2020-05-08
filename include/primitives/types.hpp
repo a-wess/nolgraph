@@ -10,11 +10,13 @@ struct Ray {
 };
 
 struct Intersection {
-  vec3<float> position;
-  vec3<float> surface_normal;
+  bool hit = false;
+  float distance = INFINITY;
+  vec3<float> position = {INFINITY, INFINITY, INFINITY};
+  vec3<float> surface_normal = {0.0f, 0.0f, 0.0f};
 };
 
-class I_surface {
+class ISurface {
 public:
   virtual Intersection intersect(const Ray& r) = 0;
 };

@@ -3,7 +3,7 @@
 
 #include <primitives/types.hpp>
 
-class Sphere: public I_surface {
+class Sphere: public ISurface {
 public:
   Sphere(const vec3<float>& o, float r, int m): origin(o), radius(r), material_idx(m) {};
   Intersection intersect(const Ray& r) {
@@ -17,9 +17,8 @@ public:
     if (discr) {
       result.position = r.point_at((-b - sqrt(discr))/(2 * a));
       result.surface_normal = (result.position - origin).norm();
-    } else {
-      result.position = { INFINITY, INFINITY, INFINITY };
-      result.surface_normal = { 0.0f, 0.0f, 0.0f };
+      result.distance = (result.position - r.origin).value();
+      result.hit = true;
     }
 
     return result;

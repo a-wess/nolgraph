@@ -3,12 +3,18 @@
 
 #include <cmath>
 #include <iostream>
+#include <cassert>
 
 template<typename T>
 struct vec3 {
   T x, y, z;
   vec3(): x(0), y(0), z(0){};
   vec3(T _x, T _y, T _z): x{_x}, y{_y}, z{_z}{};
+
+  T operator[](int i) const {
+    assert(i >= 0 && i < 3);
+    return i == 0 ? x : i == 1 ? y : z;
+  };
 
   vec3<T>& operator-=(const vec3<T>& b) {
     this->x -= b.x;
@@ -53,6 +59,10 @@ struct vec3 {
   T value() const { return sqrt(x*x + y*y + z*z); };
   
   vec3<T> norm() const { return vec3<T>(x/value(), y/value(), z/value()); };
+
+  bool operator==(const vec3<T>& b) const {
+    return x == b.x && y == b.y && z == b.z;
+  };
   
   friend std::ostream& operator<<(std::ostream& os, const vec3<T>& v) {
     os << "(" << v.x << ", " << v.y << ", " << v.z << ")";

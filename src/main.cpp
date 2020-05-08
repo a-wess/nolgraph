@@ -11,16 +11,17 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include "tests/test.hpp"
 
-const int IMAGE_WIDTH = 640;
-const int IMAGE_HEIGHT = 360;
+const int IMAGE_WIDTH = 1280;
+const int IMAGE_HEIGHT = 720;
 
 uint8_t to_255(float f) { return static_cast<uint8_t>(std::floor(f) > 255.0f ? 255.0f : std::floor(f)); }
 
 void renderer() {
   Canvas image(IMAGE_WIDTH, IMAGE_HEIGHT);
 
-  vec3<float> cam_origin({60.0f, -60.0f, 60.0f});
+  vec3<float> cam_origin({-20.0f, -90.0f, 60.0f});
   vec3<float> cam_target({0.0f, 0.0f, 50.0f}); 
   Camera cam(cam_origin, (cam_target - cam_origin).norm(), static_cast<float>(IMAGE_WIDTH)/IMAGE_HEIGHT);
 
@@ -30,14 +31,10 @@ void renderer() {
   scene.set_camera(&cam);
   scene.sun_direction = sun;
 
-  TriangleMesh robot_mesh;
-
+  TriMesh robot_mesh;
   scene.add_material({{0.0f, 0.0f, 1.0f}, 0.2f, 0.8f});
-
-  for (int i = 0; i < robot_mesh.triangles_count; i++) {
-    auto triangle = std::make_shared<Triangle>(i, &robot_mesh);
-    scene.add_shape(triangle);
-  }
+  scene.add_mesh(&robot_mesh);
+  scene.prepare_scene();
 
   Renderer renderer(IMAGE_WIDTH, IMAGE_HEIGHT);
   renderer.set_scene(&scene);
@@ -55,6 +52,9 @@ void renderer() {
 }
 
 int main() {
+  Tests t;
+  t.test_bbox();
   renderer();
   return 0;
 }
+

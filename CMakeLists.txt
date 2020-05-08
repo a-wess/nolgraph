@@ -16,6 +16,15 @@ set_target_properties(${TARGET} PROPERTIES
   CXX_STANDARD_REQUIRED YES
 )
 
+set(TESTS
+  ./src/tests/bbox.cpp
+)
+
+set(ACC_STRUCTS
+  ./src/acc_structs/bvh.cpp
+  ./src/acc_structs/bbox.cpp
+)
+
 set(CORE
   ./src/core/camera.cpp
   ./src/core/renderer.cpp
@@ -38,6 +47,8 @@ set(SRCS
   ${CORE}
   ${IO_SYSTEM}
   ${PRIMITIVES}
+  ${ACC_STRUCTS}
+  ${TESTS}
 )
 
 add_executable(rays ${SRCS})

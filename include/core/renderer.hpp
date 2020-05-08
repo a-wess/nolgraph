@@ -10,8 +10,6 @@
 struct Tile {
   int x;
   int y;
-  int w;
-  int h;
 };
 
 class Renderer {
@@ -26,13 +24,17 @@ public:
   void set_resolution(int x, int y);
 
   std::vector<vec3<float>> &get_samples() { return samples; };
-  int get_width() { return horiz; };
-  int get_height() { return vert; };
+  int get_width() { return horiz + padding_h; };
+  int get_height() { return vert + padding_v; };
 
 private:
+  // Buffer related
   int vert;
   int horiz;
+  int padding_h;
+  int padding_v;
   int tile_size;
+  // Renderer related
   Scene* scene;
   std::vector<vec3<float>> samples;
 };

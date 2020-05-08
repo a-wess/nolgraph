@@ -9,21 +9,19 @@ void render_kernel(Renderer* renderer, Tile* tiles, int start, int n) {
 
 void Renderer::render() {
   std::vector<Tile> tiles;
-  int rows = horiz / 32;
-  int cols = vert / 32;
+  int rows = get_width() / 32;
+  int cols = get_height() / 32;
   std::vector<std::thread> render_workers;
   
   for (int i = 0; i < rows * cols; i++) {
     Tile t;
     t.x = i % rows;
     t.y = i / rows;
-    t.w = 32;
-    t.h = 32;
     tiles.push_back(t);
   }
 
   int tile_count = rows * cols;
-  int tiles_per_thread = std::ceil(tile_count / 6.0f);
+  int tiles_per_thread = std::ceil(tile_count / 8.0f);
   std::cout << tile_count << ' ' << tiles_per_thread << '\n';
 
   for (int i = 0; i < tile_count; i += tiles_per_thread) {
@@ -36,6 +34,7 @@ void Renderer::render() {
     worker.join();
   std::cout << "Threads are finished\n";
 }
+
 // TODO: Solve self collision problem
 vec3<float> Renderer::trace(const Ray& primary_ray, int depth) {
   vec3<float> color(0.0f, 0.0f, 0.0f);
@@ -73,10 +72,10 @@ vec3<float> Renderer::trace(const Ray& primary_ray, int depth) {
 
 
 void Renderer::process_tile(Tile& tile) {
-  int x = tile.x * tile.w;
-  int y = tile.y * tile.h;
-  for(int i = 0; i < tile.h; i++) {
-    for(int j = 0; j < tile.w; j++) {
+  int x = tile.x * tile_size;
+  int y = tile.y * tile_size;
+  for(int i = 0; i < tile_size; i++) {
+    for(int j = 0; j < tile_size; j++) {
       float u  = static_cast<float>(j + x) / horiz;
       float v = static_cast<float>(i + y) / vert;
       Ray from_eye = scene->get_camera().shoot_ray(u, 1.0f - v);
@@ -88,7 +87,10 @@ void Renderer::process_tile(Tile& tile) {
 }
 
 void Renderer::set_resolution(int x, int y) {
-  horiz = x + x % tile_size;
-  vert = y + y % tile_size;
-  samples.resize(horiz * vert);
+  horiz = x;
+  vert = y;
+  padding_h = x % tile_size ? tile_size - x % tile_size : 0;
+  padding_v = y % tile_size ? tile_size - y % tile_size : 0;
+  std::cout << get_width() << ' ' << get_height() << '\n';
+  samples.resize(get_width() * get_height());
 }
