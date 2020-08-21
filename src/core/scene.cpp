@@ -1,21 +1,28 @@
-#include <core/scene.hpp>
+#include "scene.hpp"
+
+#include <acc_structs/bvh.hpp>
 #include <cassert>
+#include <iostream>
 
-Intersection Scene::intersect (const Ray& ray) {
+Intersection Scene::intersect(const Ray &ray) {
   assert(bvh.is_ready());
-  return bvh.traverse(ray);
+  Intersection res;
+  // for (auto& s : faces) {
+  auto i = bvh.intersect(ray);
+  if (i.hit && i.distance < res.distance)
+    res = i;
+  // }
+  return res;
 }
 
-void Scene::add_mesh(TriMesh* mesh) {
+void Scene::add_mesh(Mesh *mesh) {
   meshes.push_back(mesh);
-  for(int i = 0; i < mesh->triangles_count; i++) {
-    triangles.push_back(Triangle(i * 3, mesh));
+  for (int i = 0; i < mesh->count; i++) {
+    if (mesh->type == MeshType::triangle) {
+      faces.push_back(new Triangle(i * 3, mesh));
+      bvh.push_primitive(faces.back());
+      // std::cout << mesh->count << ' ' << mesh->indices.size()
+      // << " " << mesh->name << '\n';
+    }
   }
-}
-
-void Scene::prepare_scene() {
-  assert(!bvh.is_ready());
-  for (auto& t : triangles)
-    bvh.push_primitive(&t);
-  bvh.build();
 }

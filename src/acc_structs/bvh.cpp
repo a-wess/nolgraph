@@ -1,8 +1,8 @@
 #include <acc_structs/bvh.hpp>
+#include <algorithm>
 #include <cstdio>
 #include <iostream>
 #include <stack>
-#include <algorithm>
 
 const int SAH_BUCKET_SIZE = 12;
 
@@ -11,8 +11,8 @@ struct SAHBucket {
   BBox box;
 };
 
-BVH::BVHNode* init_leaf(BBox& box, int offset, int count) {
-  BVH::BVHNode* node = new BVH::BVHNode();
+BVH::BVHNode *init_leaf(BBox &box, int offset, int count) {
+  BVH::BVHNode *node = new BVH::BVHNode();
   node->box = box;
   node->prim_offset = offset;
   node->prim_count = count;
@@ -21,8 +21,8 @@ BVH::BVHNode* init_leaf(BBox& box, int offset, int count) {
   return node;
 }
 
-BVH::BVHNode* init_node(BVH::BVHNode* left, BVH::BVHNode* right) {
-  BVH::BVHNode* node = new BVH::BVHNode();
+BVH::BVHNode *init_node(BVH::BVHNode *left, BVH::BVHNode *right) {
+  BVH::BVHNode *node = new BVH::BVHNode();
   node->box = left->box;
   node->box.expand(right->box);
   node->prim_offset = 0;
@@ -32,10 +32,11 @@ BVH::BVHNode* init_node(BVH::BVHNode* left, BVH::BVHNode* right) {
   return node;
 }
 
-BVH::BVHNode* BVH::recursive_build(int start, int end) {
+BVH::BVHNode *BVH::recursive_build(int start, int end) {
   int p_count = end - start;
   if (p_count == 1) {
     ordered_triangles.push_back(primitives[start].t_ptr);
+    std::cout << start << '\n';
     return init_leaf(primitives[start].box, ordered_triangles.size() - 1, 1);
   } else {
     BBox bound;
@@ -54,52 +55,60 @@ BVH::BVHNode* BVH::recursive_build(int start, int end) {
 }
 
 void BVH::build() {
+  for (auto &p : primitives) {
+    std::cout << p.t_ptr->mesh->name << '\n';
+  }
   root = recursive_build(0, primitives.size());
 };
 
-void recursive_destroy(BVH::BVHNode* node) {
-  if (node->left) recursive_destroy(node->left);
-  if (node->right) recursive_destroy(node->right);
+void recursive_destroy(BVH::BVHNode *node) {
+  if (node->left)
+    recursive_destroy(node->left);
+  if (node->right)
+    recursive_destroy(node->right);
   delete node;
 }
 
-Intersection BVH::traverse(const Ray& ray) {
-  std::stack<BVH::BVHNode*> s;
+Intersection BVH::intersect(const Ray &ray) {
+  std::stack<BVH::BVHNode *> s;
   Intersection res;
 
   s.push(root);
-  while(!s.empty()) {
+  while (!s.empty()) {
     auto node = s.top();
     s.pop();
     if (!node->right && !node->left) {
       auto t = ordered_triangles[node->prim_offset]->intersect(ray);
       if (t.hit && t.distance < res.distance)
-	res = t;
+        res = t;
     } else {
       auto l = node->left->box.intersect(ray);
-      if (l.hit) s.push(node->left);
+      if (l.hit)
+        s.push(node->left);
       auto r = node->right->box.intersect(ray);
-      if (r.hit) s.push(node->right);
+      if (r.hit)
+        s.push(node->right);
     }
   }
   return res;
 }
 
-Intersection BVH::rec_debug(BVH::BVHNode* node, const Ray& ray, int depth, int i) {
+Intersection BVH::rec_debug(BVH::BVHNode *node, const Ray &ray, int depth,
+                            int i) {
   if (depth != i && (node->left || node->right)) {
     Intersection a, b;
-    if (node->left) a = rec_debug(node->left, ray, depth, i+1);
-    if (node->right) b = rec_debug(node->right, ray, depth, i+1);
+    if (node->left)
+      a = rec_debug(node->left, ray, depth, i + 1);
+    if (node->right)
+      b = rec_debug(node->right, ray, depth, i + 1);
     return a.distance < b.distance ? a : b;
   } else {
     return node->box.debug(ray);
   }
 }
 
-Intersection BVH::debug(const Ray& ray) {
+Intersection BVH::debug(const Ray &ray) {
   return rec_debug(root, ray, 1000, 0);
 }
 
-BVH::~BVH() {
-  recursive_destroy(root);
-}
+BVH::~BVH() { recursive_destroy(root); }

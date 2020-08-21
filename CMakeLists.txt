@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE Debug)
 project( rays )
 
 include_directories(
-  include/
+  src/
 )
 
 find_package(Threads)
@@ -17,7 +17,7 @@ set_target_properties(${TARGET} PROPERTIES
 )
 
 set(TESTS
-  ./src/tests/bbox.cpp
+  ./src/test/bbox.cpp
 )
 
 set(ACC_STRUCTS
@@ -29,26 +29,20 @@ set(CORE
   ./src/core/camera.cpp
   ./src/core/renderer.cpp
   ./src/core/scene.cpp
+  ./src/core/triangle.cpp
 )
 
 set(IO_SYSTEM
-  ./src/io_system/canvas.cpp
-  ./src/io_system/export_tga.cpp
-  ./src/io_system/gltf.cpp
-  ./src/io_system/json.cpp
-  )
-
-set(PRIMITIVES
-  ./src/primitives/triangle.cpp
- )
+  ./src/io/canvas.cpp
+  ./src/io/export_tga.cpp
+  ./src/io/obj_loader.cpp
+)
 
 set(SRCS
   ./src/main.cpp
   ${CORE}
   ${IO_SYSTEM}
-  ${PRIMITIVES}
   ${ACC_STRUCTS}
-  ${TESTS}
 )
 
 add_executable(rays ${SRCS})

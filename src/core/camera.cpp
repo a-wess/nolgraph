@@ -1,11 +1,9 @@
 #include <core/camera.hpp>
 #include <iostream>
 
-Camera::Camera(const vec3<float>& _origin, const vec3<float>& _dir, float _aspect_ratio) :
-  origin(_origin),
-  dir(_dir),
-  aspect_ratio(_aspect_ratio)
-{
+Camera::Camera(const vec3<float> &_origin, const vec3<float> &_dir,
+               float _aspect_ratio)
+    : origin(_origin), dir(_dir), aspect_ratio(_aspect_ratio) {
   update_axis();
 }
 
