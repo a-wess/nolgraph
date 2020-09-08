@@ -4,11 +4,16 @@
 #include <io/canvas.hpp>
 #include <io/exporters.hpp>
 #include <io/obj_loader.hpp>
+#include <acc_structs/bvh.hpp>
+#include <core/primitives/triangle.hpp>
+#include <core/primitives/quad.hpp>
 #include <iostream>
 #include <math/vec3.hpp>
 #include <memory>
 #include <thread>
 #include <vector>
+
+Material specimen_material = {{0.0f, 1.0f, 0.0f}, 0.0, 1.0};
 
 const int IMAGE_WIDTH = 800;
 const int IMAGE_HEIGHT = 800;
@@ -20,21 +25,29 @@ uint8_t to_255(float f) {
 void renderer() {
   OBJ_Loader loader;
   loader.parse_file("cornell.obj");
+  std::cout << "loaded Obj File\n";
   Canvas image(IMAGE_WIDTH, IMAGE_HEIGHT);
   Renderer renderer(IMAGE_WIDTH, IMAGE_HEIGHT);
+
+  BVH bvh;
+  for (auto &mesh : loader.get_meshes()) {
+    for (int i = 0; i < mesh.count; i++) {
+      if (mesh.type == MeshType::triangle) bvh.push_primitive(new Triangle(i * 3, &mesh, &specimen_material));
+      else if (mesh.type == MeshType::quad) bvh.push_primitive(new Quad(i * 4, &mesh, &specimen_material));
+    }
+  }
+  bvh.build();
+
   Scene scene;
-  for (auto &mesh : loader.get_meshes())
-    scene.add_mesh(&mesh);
+  scene.add_surface(&bvh);
   vec3<float> cam_origin = {-273, -500, 273};
   vec3<float> cam_target = {0, 0, 273};
   scene.sun_direction = {-0.3f, -1.0f, 0.8};
   scene.set_camera(new Camera(cam_origin, {0.0f, 1.0f, 0.0f},
                               static_cast<float>(1.0f) / 1.0f));
-  scene.add_material({{0.0f, 1.0f, 0.0f}, 0.0, 1.0});
-  scene.prepare_scene();
   renderer.set_scene(&scene);
   renderer.render();
-  // -549 559 0
+
   auto &samples = renderer.get_samples();
   for (int i = 0; i < image.height; i++) {
     for (int j = 0; j < image.width; j++) {
@@ -57,7 +70,7 @@ void test() {
 }
 
 int main() {
-  renderer();
-  // test();
+  // renderer();
+  test();
   return 0;
 }

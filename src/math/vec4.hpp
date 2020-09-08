@@ -9,6 +9,11 @@ template <typename T> struct vec4 {
   vec4() : x(0), y(0), z(0), w(0){};
   vec4(T _x, T _y, T _z, T _w) : x{_x}, y{_y}, z{_z}, w{_w} {};
 
+  T operator[](int i) const {
+    assert(i >= 0 && i < 3);
+    return i == 0 ? x : i == 1 ? y : i == 2 ? z : w;
+  };
+
   vec4<T> &operator-=(const vec4<T> &b) {
     this->x -= b.x;
     this->y -= b.y;

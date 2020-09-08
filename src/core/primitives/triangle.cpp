@@ -32,6 +32,7 @@ Intersection Triangle::intersect(const Ray &ray) {
     result.surface_normal = (p1 - p0).cross(p2 - p0).norm();
     result.hit = true;
     result.distance = (result.position - ray.origin).value();
+    result.material = material;
   }
   return result;
 }

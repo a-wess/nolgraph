@@ -2,6 +2,7 @@
 #define _RAYS_TYPES_
 
 #include <math/vec3.hpp>
+#include "material.hpp"
 
 struct Ray {
   vec3<float> origin;
@@ -11,7 +12,7 @@ struct Ray {
 
 struct Intersection {
   bool hit = false;
-  unsigned int material_idx = 0;
+  Material* material;
   float distance = INFINITY;
   vec3<float> position = {INFINITY, INFINITY, INFINITY};
   vec3<float> surface_normal = {0.0f, 0.0f, 0.0f};

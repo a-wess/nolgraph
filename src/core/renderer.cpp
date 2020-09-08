@@ -1,5 +1,6 @@
 #include <core/renderer.hpp>
 #include <thread>
+#include <iostream>
 
 void render_kernel(Renderer *renderer, Tile *tiles, int start, int n) {
   for (auto i = start; i < start + n; i++)
@@ -50,12 +51,11 @@ vec3<float> Renderer::trace(const Ray &primary_ray, int depth) {
   if (intersection.position.x != INFINITY &&
       intersection.position.y != INFINITY &&
       intersection.position.z != INFINITY) {
-    auto &material = scene->get_material(0);
+    auto &material = *intersection.material;
     auto p = intersection.position;
     auto N = intersection.surface_normal;
 
-    color += material.diffuse_coef *
-             std::max(N.dot(scene->sun_direction), 0.0f) * material.diffuse;
+    color += material.diffuse_coef * std::max(N.dot(scene->sun_direction), 0.0f) * material.diffuse;
 
     // Specular part calculation
     if (material.specular_coef > 0.05) {

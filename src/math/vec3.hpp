@@ -3,7 +3,7 @@
 
 #include <cassert>
 #include <cmath>
-#include <iostream>
+#include <ostream>
 
 template <typename T> struct vec3 {
   T x, y, z;

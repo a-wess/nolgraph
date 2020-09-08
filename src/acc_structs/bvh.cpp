@@ -35,9 +35,9 @@ BVH::BVHNode *init_node(BVH::BVHNode *left, BVH::BVHNode *right) {
 BVH::BVHNode *BVH::recursive_build(int start, int end) {
   int p_count = end - start;
   if (p_count == 1) {
-    ordered_triangles.push_back(primitives[start].t_ptr);
+    ordered_primitives.push_back(primitives[start].p_ptr.get());
     std::cout << start << '\n';
-    return init_leaf(primitives[start].box, ordered_triangles.size() - 1, 1);
+    return init_leaf(primitives[start].box, ordered_primitives.size() - 1, 1);
   } else {
     BBox bound;
     for (int i = start; i < end; i++) {
@@ -55,9 +55,6 @@ BVH::BVHNode *BVH::recursive_build(int start, int end) {
 }
 
 void BVH::build() {
-  for (auto &p : primitives) {
-    std::cout << p.t_ptr->mesh->name << '\n';
-  }
   root = recursive_build(0, primitives.size());
 };
 
@@ -78,9 +75,9 @@ Intersection BVH::intersect(const Ray &ray) {
     auto node = s.top();
     s.pop();
     if (!node->right && !node->left) {
-      auto t = ordered_triangles[node->prim_offset]->intersect(ray);
-      if (t.hit && t.distance < res.distance)
-        res = t;
+      auto intersection = ordered_primitives[node->prim_offset]->intersect(ray);
+      if (intersection.hit && intersection.distance < res.distance)
+        res = intersection;
     } else {
       auto l = node->left->box.intersect(ray);
       if (l.hit)
