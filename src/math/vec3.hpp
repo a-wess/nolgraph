@@ -26,6 +26,7 @@ template <typename T> struct vec3 {
     this->x += b.x;
     this->y += b.y;
     this->z += b.z;
+
     return *this;
   };
 
@@ -73,6 +74,10 @@ template <typename T> struct vec3 {
 
 template <typename T> vec3<T> operator*(T scalar, const vec3<T> &a) {
   return a * scalar;
+}
+
+template <typename T> vec3<T> operator*(const vec3<T> &a, const vec3<T> &b) {
+  return vec3<T>(a.x * b.x, a.y * b.y, a.z * b.z);
 }
 
 template <typename T> vec3<T> operator+(const vec3<T> &a, const vec3<T> &b) {

@@ -10,7 +10,7 @@ template <typename T> struct vec4 {
   vec4(T _x, T _y, T _z, T _w) : x{_x}, y{_y}, z{_z}, w{_w} {};
 
   T operator[](int i) const {
-    assert(i >= 0 && i < 3);
+    assert(i >= 0 && i < 4);
     return i == 0 ? x : i == 1 ? y : i == 2 ? z : w;
   };
 

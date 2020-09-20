@@ -56,6 +56,7 @@ vec3<float> Renderer::trace(const Ray &primary_ray, int depth) {
     auto N = intersection.surface_normal;
 
     color += material.diffuse_coef * std::max(N.dot(scene->sun_direction), 0.0f) * material.diffuse;
+    color += material.ambient_coef * material.diffuse;
 
     // Specular part calculation
     if (material.specular_coef > 0.05) {

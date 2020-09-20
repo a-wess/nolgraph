@@ -8,7 +8,23 @@ Intersection Quad::intersect(const Ray &ray) {
   vec3<float> p1 = mesh->vertices[indices[1]].position;
   vec3<float> p2 = mesh->vertices[indices[2]].position;
   vec3<float> p3 = mesh->vertices[indices[3]].position;
-  // TO DO WRIGHT INTERSECTION FUNCTION
+
+  auto normal = mesh->vertices[indices[0]].normal;
+  float t = -normal.dot(ray.origin - p0) / normal.dot(ray.dir);
+  if (t > 0) {
+    auto e1 = p3 - p0;
+    auto e2 = p1 - p0;
+    auto p = ray.point_at(t) - p0;
+    float pr1 = p.dot(e1) / e1.value();
+    float pr2 = p.dot(e2) / e2.value();
+    if ((pr1 < e1.value() && pr1 > 0) && (pr2 < e2.value() && pr2 > 0)) {
+      result.hit = true;
+      result.surface_normal = normal;
+      result.position = ray.point_at(t);
+      result.distance = (ray.dir * t).value();
+      result.material = material;
+    }
+  }
   return result;
 }
 

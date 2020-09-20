@@ -36,7 +36,6 @@ BVH::BVHNode *BVH::recursive_build(int start, int end) {
   int p_count = end - start;
   if (p_count == 1) {
     ordered_primitives.push_back(primitives[start].p_ptr.get());
-    std::cout << start << '\n';
     return init_leaf(primitives[start].box, ordered_primitives.size() - 1, 1);
   } else {
     BBox bound;
@@ -55,6 +54,7 @@ BVH::BVHNode *BVH::recursive_build(int start, int end) {
 }
 
 void BVH::build() {
+  std::cout << 0 << ' ' << primitives.size() << '\n';
   root = recursive_build(0, primitives.size());
 };
 
@@ -105,7 +105,7 @@ Intersection BVH::rec_debug(BVH::BVHNode *node, const Ray &ray, int depth,
 }
 
 Intersection BVH::debug(const Ray &ray) {
-  return rec_debug(root, ray, 1000, 0);
+  return rec_debug(root, ray, 100, 0);
 }
 
 BVH::~BVH() { recursive_destroy(root); }

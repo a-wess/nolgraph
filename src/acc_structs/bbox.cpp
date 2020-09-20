@@ -65,6 +65,14 @@ Intersection BBox::intersect(const Ray &ray) {
   return res;
 }
 
+Material debug_material = {
+  {1.0f, 0.0f, 0.0f},
+  {0.1f, 0.4f, 0.4},
+  0.0f,
+  0.8f,
+  0.2f
+};
+
 Intersection BBox::debug(const Ray &r) {
   Intersection res;
   res.hit = false;
@@ -111,7 +119,7 @@ Intersection BBox::debug(const Ray &r) {
     res.surface_normal = {0, 0, 1};
     res.surface_normal *= (localPoint.z > 0) ? 1 : -1;
   }
-
+  res.material = &debug_material;
   return res;
 }
 

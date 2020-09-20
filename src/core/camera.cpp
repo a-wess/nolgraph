@@ -16,7 +16,7 @@ void Camera::update_axis() {
 Ray Camera::shoot_ray(float u, float v) {
   Ray out;
   float x = 1.0f;
-  float y = 2 * aspect_ratio * (u - 0.5);
+  float y = -2 * aspect_ratio * (u - 0.5);
   float z = 2 * (v - 0.5);
 
   out.dir.x = dir.x * x + right.x * y + up.x * z;

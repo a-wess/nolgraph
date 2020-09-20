@@ -47,7 +47,6 @@ std::vector<Vertex> parse_face(std::stringstream& ss, std::vector<vec3<float>>& 
       }
     }
     num *= sign;
-    std::cout << positions.size() << ' '<< positions.size() + num << '\n';
     switch (state) {
       case ParseState::Position:
         v.position = positions[num > 0 ? num - 1 : positions.size() + num];
@@ -63,7 +62,7 @@ std::vector<Vertex> parse_face(std::stringstream& ss, std::vector<vec3<float>>& 
     vertices.push_back(v);
   }
 
-  vec3<float> normal = (positions[1] - positions[0]).cross(positions[2] - positions[0]).norm();
+  vec3<float> normal = (vertices[2].position - vertices[0].position).cross(vertices[1].position- vertices[0].position).norm();
   for (auto& v : vertices) v.normal = normal;
 
   return vertices;
@@ -81,29 +80,27 @@ bool OBJ_Loader::parse_file(std::string_view fname) {
     if (std::isspace(line[0]) || line[0] == '#' || line[0] == 's' || line[0] == 'u' || line[0] == 'm')
       continue;
     std::stringstream ss(line);
-    std::cout << line << '\n';
     ss >> str;
     float x, y, z;
     if (str == "v") {
       ss >> x >> y >> z;
-      std::cout << x << ' ' << y << ' ' << z << '\n';
-      positions.push_back({x, y, z});
+      positions.push_back({-x, y, z});
     } else if (str == "vn") {
       ss >> x >> y >> z;
-      normals.push_back({x, y, z});
+      normals.push_back({-x, y, z});
     } else if (str == "vt") {
       ss >> x >> y >> z;
     } else if (str == "f") {
       auto vertices = parse_face(ss, positions, normals);
       auto indices = std::vector<int>(vertices.size());
       std::iota(indices.begin(), indices.end(), meshes.back().indices.empty() ? 0 : meshes.back().indices.back() + 1);
-
+      if (vertices.size() > 3 && meshes.back().type == MeshType::triangle) meshes.back().type = MeshType::quad;
       meshes.back().vertices.insert(meshes.back().vertices.end(), std::make_move_iterator(vertices.begin()), std::make_move_iterator(vertices.end()));
       meshes.back().indices.insert(meshes.back().indices.end(), std::make_move_iterator(indices.begin()), std::make_move_iterator(indices.end()));
       meshes.back().count++;
     } else if (str == "g") {
       meshes.push_back(Mesh());
-      meshes.back().type = MeshType::quad;
+      meshes.back().type = MeshType::triangle;
       ss >> str;
       meshes.back().name = str;
     }

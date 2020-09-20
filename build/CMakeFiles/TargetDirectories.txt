@@ -1,3 +1,0 @@
-/home/auyez/projects/psnl/nolgraph/build/CMakeFiles/rebuild_cache.dir
-/home/auyez/projects/psnl/nolgraph/build/CMakeFiles/rays.dir
-/home/auyez/projects/psnl/nolgraph/build/CMakeFiles/edit_cache.dir
