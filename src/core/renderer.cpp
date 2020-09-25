@@ -1,15 +1,33 @@
 #include <core/renderer.hpp>
 #include <thread>
 #include <iostream>
+#include <math/helpers.hpp>
+#include <queue>
+#include <mutex>
+#include <random>
 
-void render_kernel(Renderer *renderer, Tile *tiles, int start, int n) {
-  for (auto i = start; i < start + n; i++)
-    renderer->process_tile(tiles[i]);
-  std::cout << "Thread has finished " << start << '\n';
+std::mutex tile_queue_lock;
+
+void render_kernel(Renderer *renderer, std::queue<Tile>& tiles) {
+  bool proccessing = true;
+  while(proccessing) {
+    tile_queue_lock.lock();
+    if (!tiles.empty()) {
+      auto tile = tiles.front();
+      tiles.pop();
+      tile_queue_lock.unlock();
+      renderer->process_tile(tile);
+    } else {
+      tile_queue_lock.unlock();
+      break;
+    }
+  }
+  // renderer->process_tile(tiles[i]);
+  std::cout << "Thread has finished \n";
 }
 
 void Renderer::render() {
-  std::vector<Tile> tiles;
+  std::queue<Tile> tiles;
   int rows = get_width() / 32;
   int cols = get_height() / 32;
   std::vector<std::thread> render_workers;
@@ -18,21 +36,11 @@ void Renderer::render() {
     Tile t;
     t.x = i % rows;
     t.y = i / rows;
-    tiles.push_back(t);
+    tiles.push(t);
   }
 
-  int tile_count = rows * cols;
-  int tiles_per_thread = std::ceil(tile_count / 8.0f);
-  std::cout << tile_count << ' ' << tiles_per_thread << '\n';
-
-  for (int i = 0; i < tile_count; i += tiles_per_thread) {
-    std::thread tmp(render_kernel, this, tiles.data(), i,
-                    i + tiles_per_thread < tile_count ? tiles_per_thread
-                                                      : tile_count - i);
-    std::cout << i << ' '
-              << ((i + tiles_per_thread) < tile_count ? tiles_per_thread
-                                                      : tile_count - i)
-              << '\n';
+  for (int i = 0; i < 12; i++) {
+    std::thread tmp(render_kernel, this, std::ref(tiles));
     render_workers.push_back(std::move(tmp));
   }
 
@@ -41,55 +49,46 @@ void Renderer::render() {
   std::cout << "Threads are finished\n";
 }
 
-// TODO: Solve self collision problem
-vec3<float> Renderer::trace(const Ray &primary_ray, int depth) {
-  vec3<float> color(0.0f, 0.0f, 0.0f);
-  if (depth > 1)
-    return vec3<float>(0.8f, 0.2f, 0.0f);
+vec3<float> Renderer::trace_path(const Ray &primary_ray, int depth) {
+  if (depth == 0) return {0.0f, 0.0f, 0.0f};
 
   auto intersection = scene->intersect(primary_ray);
-  if (intersection.position.x != INFINITY &&
-      intersection.position.y != INFINITY &&
-      intersection.position.z != INFINITY) {
+  if (intersection.position.x != std::numeric_limits<float>::infinity() &&
+      intersection.position.y != std::numeric_limits<float>::infinity() &&
+      intersection.position.z != std::numeric_limits<float>::infinity()) {
     auto &material = *intersection.material;
     auto p = intersection.position;
     auto N = intersection.surface_normal;
 
-    color += material.diffuse_coef * std::max(N.dot(scene->sun_direction), 0.0f) * material.diffuse;
-    color += material.ambient_coef * material.diffuse;
+    Ray emited_ray;
+    emited_ray.origin = intersection.position + vec_in_direction(N, 5.0f * std::numeric_limits<float>::epsilon());
+    emited_ray.dir = sample_hemishpere(N);
 
-    // Specular part calculation
-    if (material.specular_coef > 0.05) {
-      auto view_vector = primary_ray.dir * -1.0f;
-      auto light_vector = N * 2 * view_vector.dot(N) - view_vector;
-
-      Ray from_specular;
-      from_specular.origin = p + N * 1e-4;
-      from_specular.dir = light_vector;
-      float specular = pow(std::max(light_vector.dot(N), 0.0f), 1);
-      auto specular_color = trace(from_specular, depth + 1);
-      specular_color *= material.specular_coef * specular;
-      //    if (specular_color.value() > 0)
-      color += specular_color; // specular_color *
-                               // material.specular_coef
-                               // * specular;
-    }
-    return color;
+    float pdf = 1.0f / (2.0f * M_PI);
+    auto spectral_radiance = trace_path(emited_ray, depth - 1);
+    auto radiance = (material.diffuse / static_cast<float>(M_PI)) * N.dot(emited_ray.dir) * spectral_radiance / pdf;
+    return radiance;
   } else {
-    return vec3<float>(0.8f, 0.2f, 0.0f);
+    auto t = 0.5f * primary_ray.dir.norm().y + 1.0f;
+    return (1.0f-t) * vec3<float>(1.0, 1.0, 1.0) + t * vec3<float>(0.5, 0.7, 1.0);
   }
 };
 
-void Renderer::process_tile(Tile &tile) {
+void Renderer::process_tile(Tile &tile) { 
   int x = tile.x * tile_size;
   int y = tile.y * tile_size;
+  float scale = 1.0f / rays_per_sample;
   for (int i = 0; i < tile_size; i++) {
     for (int j = 0; j < tile_size; j++) {
+      auto color = vec3<float>(0.0f, 0.0f, 0.0f);
       float u = static_cast<float>(j + x) / horiz;
       float v = static_cast<float>(i + y) / vert;
-      Ray from_eye = scene->get_camera().shoot_ray(u, 1.0f - v);
-      auto color = trace(from_eye, 0);
-      // samples[i * tile.w + j] = color;
+      for (int k = 0; k < rays_per_sample; k++) {
+        Ray from_eye = scene->get_camera().shoot_ray(u, 1.0f - v);
+        vec3<float> radiance = trace_path(from_eye, 8);
+        color += radiance;
+      }
+      color /= static_cast<float>(rays_per_sample);
       samples[(y + i) * horiz + x + j] = color;
     }
   }

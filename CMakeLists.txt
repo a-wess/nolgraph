@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_BUILD_TYPE Debug)
-
+#set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 project( rays )
 
 include_directories(
@@ -30,6 +30,10 @@ set(CORE
   ./src/core/primitives/quad.cpp
 )
 
+set(MATH
+  ./src/math/helpers.cpp
+)
+
 set(IO_SYSTEM
   ./src/io/canvas.cpp
   ./src/io/export_tga.cpp
@@ -38,6 +42,7 @@ set(IO_SYSTEM
 
 set(SRCS
   ./src/main.cpp
+  ${MATH}
   ${CORE}
   ${IO_SYSTEM}
   ${ACC_STRUCTS}
@@ -52,7 +57,7 @@ set(TESTS
   src/test/test_define.cpp
   src/test/primitives.cpp
 )
-add_executable(test ${TESTS} ${CORE} ${ACC_STRUCTS})
+add_executable(test ${TESTS} ${CORE} ${ACC_STRUCTS} ${MATH})
 target_link_libraries(test ${CMAKE_THREAD_LIBS_INIT})
 set_target_properties(test PROPERTIES
   CXX_STANDARD 17

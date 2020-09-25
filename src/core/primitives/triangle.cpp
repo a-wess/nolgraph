@@ -29,7 +29,17 @@ Intersection Triangle::intersect(const Ray &ray) {
   float t = f * e2.dot(q);
   if (t > EPSILON) {
     result.position = ray.point_at(t);
-    result.surface_normal = mesh->vertices[indices[0]].normal;
+    auto v0 = p1 - p0, v1 = p2 - p0, v2 = result.position - p0;
+    float d00 = v0.dot(v0);
+    float d01 = v0.dot(v1);
+    float d11 = v1.dot(v1);
+    float d20 = v2.dot(v0);
+    float d21 = v2.dot(v1);
+    float denom = d00 * d11 - d01 * d01;
+    float v = (d11 * d20 - d01 * d21) / denom;
+    float w = (d00 * d21 - d01 * d20) / denom;
+    float u = 1.0f - v - w;
+    result.surface_normal = u * mesh->vertices[indices[0]].normal + v * mesh->vertices[indices[1]].normal + w * mesh->vertices[indices[2]].normal;
     result.hit = true;
     result.distance = (result.position - ray.origin).value();
     result.material = material;

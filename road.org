@@ -1,0 +1,17 @@
+RAYS PROJECT -*- mode: org -*-
+
+* Things to accomplish
+** DONE Try to implement simple path tracing algorithm
+** TODO Benchmark average time required by rays
+** TODO Learn more about sampling
+** TODO Read up more about light transport algorithms
+** TODO Recreate Cornell Box
+** TODO Implement methods to fit model into box (like in go path tracer)
+** TODO Implement better camera model
+** DONE Implement BVH tree or another acceleration structure
+** DONE Learn more about triangle-ray intersection algorithm and try to derive them by yourself
+** TODO Revise some crucial topics from Linear Algebra
+** DONE Refactor Scene class
+** DONE Make rendering proccess multi-threaded
+** TODO Implement PNG importer and exporter using only zlib
+** TODO Finish GLTF importer

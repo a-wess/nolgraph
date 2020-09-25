@@ -13,8 +13,12 @@ struct Ray {
 struct Intersection {
   bool hit = false;
   Material* material;
-  float distance = INFINITY;
-  vec3<float> position = {INFINITY, INFINITY, INFINITY};
+  float distance = std::numeric_limits<float>::infinity();
+  vec3<float> position = {
+    std::numeric_limits<float>::infinity(),
+    std::numeric_limits<float>::infinity(),
+    std::numeric_limits<float>::infinity()
+  };
   vec3<float> surface_normal = {0.0f, 0.0f, 0.0f};
 };
 

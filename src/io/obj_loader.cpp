@@ -62,8 +62,8 @@ std::vector<Vertex> parse_face(std::stringstream& ss, std::vector<vec3<float>>& 
     vertices.push_back(v);
   }
 
-  vec3<float> normal = (vertices[2].position - vertices[0].position).cross(vertices[1].position- vertices[0].position).norm();
-  for (auto& v : vertices) v.normal = normal;
+  //vec3<float> normal = (vertices[1].position - vertices[0].position).cross(vertices[2].position - vertices[0].position).norm();
+  //for (auto& v : vertices) v.normal = normal;
 
   return vertices;
 }
@@ -84,10 +84,10 @@ bool OBJ_Loader::parse_file(std::string_view fname) {
     float x, y, z;
     if (str == "v") {
       ss >> x >> y >> z;
-      positions.push_back({-x, y, z});
+      positions.push_back({x, y, z});
     } else if (str == "vn") {
       ss >> x >> y >> z;
-      normals.push_back({-x, y, z});
+      normals.push_back({x, y, z});
     } else if (str == "vt") {
       ss >> x >> y >> z;
     } else if (str == "f") {

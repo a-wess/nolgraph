@@ -21,7 +21,7 @@ public:
       res.hit = true;
       res.distance = (ray.dir * t).value();
       res.position = ray.point_at(t);
-      res.surface_normal = res.position - pos;
+      res.surface_normal = (res.position - pos).norm();
       res.material = material;
     }
     return res;

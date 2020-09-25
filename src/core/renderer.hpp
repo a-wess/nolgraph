@@ -15,13 +15,16 @@ struct Tile {
 
 class Renderer {
 public:
-  Renderer(int w, int h, int t_size = 32) : tile_size(t_size) {
+  Renderer(int w, int h, int rays_per_sample, int t_size = 32):
+    tile_size(t_size),
+    rays_per_sample(rays_per_sample)
+  {
     set_resolution(w, h);
   };
   void render();
   void process_tile(Tile &tile);
 
-  vec3<float> trace(const Ray &primary_ray, int depth);
+  vec3<float> trace_path(const Ray &primary_ray, int depth);
 
   void set_scene(Scene *s) { scene = s; };
   void set_resolution(int x, int y);
@@ -38,6 +41,7 @@ private:
   int padding_v;
   int tile_size;
   // Renderer related
+  int rays_per_sample;
   Scene *scene;
   std::vector<vec3<float>> samples;
 };

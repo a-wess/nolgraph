@@ -5,7 +5,15 @@
 
 struct BBox {
   BBox()
-      : mn(INFINITY, INFINITY, INFINITY), mx(-INFINITY, -INFINITY, -INFINITY){};
+      : mn(
+        std::numeric_limits<float>::infinity(),
+        std::numeric_limits<float>::infinity(),
+        std::numeric_limits<float>::infinity()
+      ), mx(
+        -std::numeric_limits<float>::infinity(),
+        -std::numeric_limits<float>::infinity(),
+        -std::numeric_limits<float>::infinity()
+  ){};
   BBox(const vec3<float> &_min, const vec3<float> &_max) : mn(_min), mx(_max){};
   Intersection intersect(const Ray &ray);
   Intersection debug(const Ray &ray);

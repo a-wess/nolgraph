@@ -17,7 +17,7 @@ void BBox::expand(const vec3<float> &point) {
 
 float BBox::area() {
   // case of empty box
-  if (mx.x == -INFINITY || mn.x == INFINITY)
+  if (mx.x == -std::numeric_limits<float>::infinity() || mn.x == std::numeric_limits<float>::infinity())
     return 0.0f;
   auto d = mx - mn;
   return 2 * (fabs(d.x * d.z) + fabs(d.x * d.y) + fabs(d.z * d.y));
@@ -77,8 +77,8 @@ Intersection BBox::debug(const Ray &r) {
   Intersection res;
   res.hit = false;
 
-  float tmin = -INFINITY;
-  float tmax = INFINITY;
+  float tmin = -std::numeric_limits<float>::infinity();
+  float tmax = std::numeric_limits<float>::infinity();
 
   for (int i = 0; i < 3; i++) {
     float t1 = (mn[i] - r.origin[i]) / r.dir[i];

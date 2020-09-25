@@ -68,6 +68,5 @@ TEST_CASE("Ray-Quad intersection") {
         1.00, -1.04, 0.0,
         -0.99, -1.04, 0.0,
     });
-    CAPTURE( quad.intersect(r).surface_normal);
     REQUIRE( quad.intersect(r).hit == true);
 }
