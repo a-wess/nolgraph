@@ -1,7 +1,7 @@
 #include "scene.hpp"
 #include <cassert>
 
-Intersection Scene::intersect(const Ray &ray) {
+Intersection Scene::intersect(const Ray &ray) const{
   Intersection res;
   for (auto& surface : surfaces) {
     auto i = surface->intersect(ray);

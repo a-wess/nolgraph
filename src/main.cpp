@@ -9,9 +9,9 @@
 #include <core/primitives/quad.hpp>
 #include <core/primitives/sphere.hpp>
 #include <core/primitives/plane.hpp>
+#include <core/integrators/uniform.hpp>
 #include <iostream>
 #include <math/vec3.hpp>
-#include <math/helpers.hpp>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -35,6 +35,8 @@ Material specimen_material_2 = {
 const int IMAGE_WIDTH = 1280;
 const int IMAGE_HEIGHT = 720;
 
+float clamp (float x, float min, float max) { return x < min ? min : x > max ? max : x; }
+
 uint8_t to_255(float f) {
   return static_cast<uint8_t>(std::floor(f) > 255.0f ? 255.0f : std::floor(f));
 }
@@ -44,7 +46,7 @@ void renderer() {
   loader.parse_file("llucy.obj");
   std::cout << "loaded Obj File\n";
   Canvas image(IMAGE_WIDTH, IMAGE_HEIGHT);
-  Renderer renderer(IMAGE_WIDTH, IMAGE_HEIGHT, 64);
+  Renderer renderer(IMAGE_WIDTH, IMAGE_HEIGHT, new UniformRandomIntegrator(16));
 
   BVH bvh;
   for (auto &mesh : loader.get_meshes()) {

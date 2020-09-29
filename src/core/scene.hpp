@@ -14,7 +14,7 @@
 
 class Scene {
 public:
-  Intersection intersect(const Ray &ray);
+  Intersection intersect(const Ray &ray) const;
   void add_surface(ISurface *surface) { surfaces.push_back(surface); };
   Camera &get_camera() { return *camera; };
   void set_camera(Camera *cam) { camera = cam; };

@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "scene.hpp"
+#include "integrators/integrator.hpp"
 
 struct Tile {
   int x;
@@ -15,16 +16,14 @@ struct Tile {
 
 class Renderer {
 public:
-  Renderer(int w, int h, int rays_per_sample, int t_size = 32):
-    tile_size(t_size),
-    rays_per_sample(rays_per_sample)
+  Renderer(int w, int h, Integrator* integrator, int t_size = 32):
+    integrator(integrator),
+    tile_size(t_size)
   {
     set_resolution(w, h);
   };
   void render();
   void process_tile(Tile &tile);
-
-  vec3<float> trace_path(const Ray &primary_ray, int depth);
 
   void set_scene(Scene *s) { scene = s; };
   void set_resolution(int x, int y);
@@ -41,8 +40,8 @@ private:
   int padding_v;
   int tile_size;
   // Renderer related
-  int rays_per_sample;
   Scene *scene;
+  std::unique_ptr<Integrator> integrator;
   std::vector<vec3<float>> samples;
 };
 

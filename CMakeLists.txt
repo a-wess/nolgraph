@@ -28,10 +28,11 @@ set(CORE
   ./src/core/scene.cpp
   ./src/core/primitives/triangle.cpp
   ./src/core/primitives/quad.cpp
+  ./src/core/integrators/uniform.cpp
+  ./src/core/integrators/integrator.cpp
 )
 
 set(MATH
-  ./src/math/helpers.cpp
 )
 
 set(IO_SYSTEM
