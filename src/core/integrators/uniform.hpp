@@ -1,5 +1,7 @@
 #ifndef _ONE_DIRECTIONAL_CLASS_
 #define _ONE_DIRECTIONAL_CLASS_
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include "integrator.hpp"
 #include <random>
 

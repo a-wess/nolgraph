@@ -69,7 +69,7 @@ std::vector<Vertex> parse_face(std::stringstream& ss, std::vector<vec3<float>>& 
 }
 
 bool OBJ_Loader::parse_file(std::string_view fname) {
-  std::ifstream input_file(fname.cbegin());
+  std::ifstream input_file(fname.data());
 
   std::string line;
   std::string str;
